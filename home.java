@@ -4,12 +4,12 @@ public class home {
   public static void main(String args[]) {
     Scanner input = new Scanner(System.in);
 
-    System.out.println("Welcome to our flight reservation system!\nWhat would you like to do?: \n1.<>\t\t2.<>\n3.<>\t\t4<>");
+    System.out.println("Welcome to our flight reservation system!\nWhat would you like to do?: \n1.Flight Reservation\t\t2.<>\n3.<>\t\t\t\t4<>");
     int choice = input.nextInt();
 
     switch (choice) { // This switch will call certain methods depending on the choice
       case 1: {
-		System.out.println("1");
+		ReserveFlight();
 		break;
       }
       case 2: {
@@ -28,4 +28,9 @@ public class home {
 
     input.close();
   }
+
+  public static void ReserveFlight() {
+  }
+
 }
+
