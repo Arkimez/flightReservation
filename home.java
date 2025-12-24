@@ -4,7 +4,7 @@ public class home {
   public static void main(String args[]) {
     Scanner input = new Scanner(System.in);
 
-    System.out.println("Welcome to our flight reservation system!\nWhat would you like to do?: \n1.Flight Reservation\t\t2.<>\n3.<>\t\t\t\t4<>");
+    System.out.println("Welcome to our flight reservation system!\nWhat would you like to do?: \n1.Flight Reservation\t\t2.Check Schedule\nn3.<>\t\t\t\t4<>");
     int choice = input.nextInt();
 
     switch (choice) { // This switch will call certain methods depending on the choice
@@ -13,7 +13,7 @@ public class home {
 		break;
       }
       case 2: {
-		System.out.println("2");
+		CheckSchedule();
 		break;
       }
      case 3: {
@@ -30,6 +30,9 @@ public class home {
   }
 
   public static void ReserveFlight() {
+  }
+
+  public static void CheckSchedule() {
   }
 
 }
