@@ -1,63 +1,83 @@
 import java.util.Scanner;
 
 public class home {
-  public static void main(String args[]) {
-    Scanner input = new Scanner(System.in);
+    public static void main(String args[]) {
+        Scanner input = new Scanner(System.in);
 
-    System.out.println("Welcome to our flight reservation system!\nWhat would you like to do?: \n1.Flight Reservation\t\t2.Check Schedule\nn3.<>\t\t\t\t4<>");
-    int choice = input.nextInt();
+       System.out.println("Welcome to our flight reservation system!\nWhat would you like to do?: \n1.Flight Reservation\t\t2.Check Schedule\n3.Exit\t\t\t\t");
+        System.out.print("= ");
+        int choice = input.nextInt();
+        input.nextLine();
 
-    switch (choice) {
-      case 1: {
-		ReserveFlight();
-		break;
-      }
-      case 2: {
-		CheckSchedule();
-		break;
-      }
-      case 3: {
-		System.out.println("3");
-		break;
-      }
-      case 4: {
-		System.out.println("4");
-		break;
-      }
+        switch (choice) {
+            case 1: {
+                        UserInfo(input);
+                        ReserveFlight();// 1st choices for flight reservation
+                        break;
+            }
+            case 2: {
+                        CheckSchedule();
+                        break;
+            }
+        }
+
     }
 
-    input.close();
-  }
+    public static void UserInfo(Scanner input){
 
-  // Currently used only for assigning to arrays
-  public static void ReserveFlight() {
+        String name;
+        String phone;
+
+        // This for getting user info        
+        System.out.print("Enter Your Name (ID): ");
+        name = input.nextLine(); //get user name
+        System.out.print("Enter phone number: ");
+        phone = input.nextLine();//get phone number
+
+    }
+
+    // Currently used only for assigning to arrays
+public static void ReserveFlight() {
+
     char[][] plane1 = new char[4][20];
+    char[] rows = {'A', 'B', 'C', 'D'};
 
-    // To assign availability of seats
+    // Assign availability
     for (int i = 0; i < plane1.length; i++) {
-      for (int j = 0; j < plane1[0].length; j++) {
-	double rand = (Math.random());
-	if (rand > 0.5)
-	  plane1[i][j] = 'O';
-	else
-	  plane1[i][j] = 'X';
-      }
+        for (int j = 0; j < plane1[i].length; j++) {
+            double rand = (Math.random());
+            if (rand > 0.5)
+                plane1[i][j] = 'O';
+            else
+                plane1[i][j] = 'X';
+        }
     }
 
-    for (int i = 0; i < plane1.length; i++) {
-      for (int j = 0; j < plane1[0].length; j++)
-	System.out.print(plane1[i][j] + "\s");
+    System.out.println("\nSeat Map ('O' = Available, 'X' = Booked)\n");
 
-      // To display seats according to rows 
-      System.out.println();
-      if (i == 1)
-	System.out.println();
+    // Print column numbers
+    System.out.print("    ");
+    for (int d = 1; d <= plane1[0].length; d++) {
+        System.out.printf("%02d ", d);
     }
+    System.out.println();
 
-  }
+    // Print seat rows
+    for (int i = 0; i < plane1.length; i++) {
 
-  public static void CheckSchedule() {
-  }
+        if (i == 2) System.out.println(); // aisle space
 
+        System.out.print(rows[i] + "   ");
+        for (int j = 0; j < plane1[i].length; j++) {
+            System.out.print(plane1[i][j] + "  ");
+        }
+        System.out.println();
+    }
+}
+
+
+public static void CheckSchedule() {
+
+}
 }
 
