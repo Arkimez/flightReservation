@@ -1,10 +1,11 @@
 import java.util.Scanner;
+import java.util.Random;
 
 public class home {
     public static void main(String args[]) {
         Scanner input = new Scanner(System.in);
 
-       System.out.println("Welcome to our flight reservation system!\nWhat would you like to do?: \n1.Flight Reservation\t\t2.Check Schedule\n3.Exit\t\t\t\t");
+       System.out.println("Welcome to our flight reservation system!\nWhat would you like to do?: \n1.Flight Reservation\t\n2.Check Schedule\n3.Exit\t\t\t\t");
         System.out.print("= ");
         int choice = input.nextInt();
         input.nextLine();
@@ -16,7 +17,11 @@ public class home {
                         break;
             }
             case 2: {
-                        CheckSchedule();
+                        CheckSchedule();// 2nd choices for checking flight schedule
+                        break;
+            }
+            case 3: {
+                        System.out.println("Thank you for using our system. Goodbye!");
                         break;
             }
         }
@@ -26,15 +31,22 @@ public class home {
     public static void UserInfo(Scanner input){
 
         String name;
+        int identificationNumber;
         String phone;
+        String email;
 
         // This for getting user info        
         System.out.print("Enter Your Name (ID): ");
         name = input.nextLine(); //get user name
+        System.out.print("Enter identification number: ");
+        identificationNumber = input.nextInt();
         System.out.print("Enter phone number: ");
         phone = input.nextLine();//get phone number
+        System.out.print("Enter email address: ");
+        email = input.nextLine();//get email address
 
     }
+    
 
     // Currently used only for assigning to arrays
 public static void ReserveFlight() {
