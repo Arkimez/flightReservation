@@ -36,8 +36,8 @@ public class airline {
 
             switch (choice) {
                 case 1:
-                    User Information = registerUser();
-                    flightReservation(Information);
+                    User information = registerUser();
+                    flightReservation(information);
                     break;
                 case 2:
                     checkSchedule();
@@ -118,7 +118,6 @@ public class airline {
         case 'A': selectedDate = dateOptions[0]; break;
         case 'B': selectedDate = dateOptions[1]; break;
         case 'C': selectedDate = dateOptions[2]; break;
-        case 'D': selectedDate = dateOptions[3]; break;
         default:
             System.out.println("Invalid choice. Returning to menu.");
             return;
@@ -191,7 +190,8 @@ public class airline {
 
     // ----- PART 5 PAYMENT -----
     double totalPrice = passengerCount * flightPrice;
-    System.out.println("\nTotal Price (RM): " + totalPrice);
+    System.out.printf("Price (RM)    : %.2f%n", flightPrice);
+    System.out.printf("Total Price (RM): %.2f%n", totalPrice);
     System.out.print("Proceed to payment? (Y/N): ");
     char pay = sc.next().toUpperCase().charAt(0);
     sc.nextLine();
@@ -201,7 +201,8 @@ public class airline {
     System.out.println("Payment successful!");
 
     // ----- PART 6 SAVE -----
-    saveBooking(user, bookedSeats, selectedDate, totalPrice);
+   saveBooking(user, bookedSeats, selectedDate, totalPrice);
+
 
     System.out.println("\nBooking Complete! Thank you, " + user.name + "!");
 }
