@@ -96,11 +96,16 @@ public class airline {
 
     // ----- DATE SELECTION (A, B, C) -----
     String[] dateOptions = new String[3];
-
-    for (int i = 0; i < 3; i++) {
-        int year = rand.nextInt(10) + 2026;
+        int day = 0;
+        int year = 2026;
+    for (int i = 0; i < 3; i++) {    
         int month = rand.nextInt(12) + 1;
-        int day = rand.nextInt(28) + 1;
+
+            if(month == 2){
+                day = rand.nextInt(27) + 1;
+            }else{
+                day = rand.nextInt(30) + 1;
+            }
         dateOptions[i] = String.format("%04d-%02d-%02d", year, month, day);
     }
 
@@ -201,7 +206,7 @@ public class airline {
     System.out.println("Payment successful!");
 
     // ----- PART 6 SAVE -----
-   saveBooking(user, bookedSeats, selectedDate, totalPrice);
+    saveBooking(user, bookedSeats, selectedDate, totalPrice, selectedOrigin, selectedDestination);
 
 
     System.out.println("\nBooking Complete! Thank you, " + user.name + "!");
@@ -231,21 +236,24 @@ public class airline {
     }
 
     // ---------------- Save Booking to File ----------------
-    public static void saveBooking(User user, String[] seatsBooked, String flightDate, double totalPrice) {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter("bookings.txt", true))) {
-            bw.write("UserID:" + user.userID);
-            bw.write("Name:" + user.name);
-            bw.write("FlightNumber:" + flightNumber);
-            bw.write("Origin:" + flightOrigin);
-            bw.write("Destination:" + flightDestination);
-            bw.write("Date:" + flightDate);
-            bw.write("Seats:" + String.join("-", seatsBooked));
-            bw.write("TotalPrice: RM " + String.format("%.2f", totalPrice));
-            bw.newLine();
-        } catch (IOException e) {
-            System.out.println("Error saving booking.");
-        }
+    public static void saveBooking(User user, String[] seatsBooked, String flightDate, 
+                                double totalPrice, String origin, String destination) {
+    try (BufferedWriter bw = new BufferedWriter(new FileWriter("bookings.txt", true))) {
+        // Save everything in one line, separated by "|"
+        String bookingLine = user.userID + "|" + 
+                            user.name + "|" + 
+                            flightNumber + "|" + 
+                            origin + "|" + 
+                            destination + "|" + 
+                            flightDate + "|" + 
+                            String.join(", ", seatsBooked) + "|" + 
+                            String.format("%.2f", totalPrice);
+        bw.write(bookingLine);
+        bw.newLine();
+    } catch (IOException e) {
+        System.out.println("Error saving booking.");
     }
+}
 
     // ---------------- PART 7: Check Schedule ----------------
     public static void checkSchedule() {
