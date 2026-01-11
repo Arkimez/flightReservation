@@ -6,17 +6,13 @@ public class airline {
     static Scanner sc = new Scanner(System.in);
     static Random rand = new Random();
     static char[] rows = {'A', 'B', 'C', 'D'};
-    static char[][] planeSeats = new char[4][30]; // 4 rows x 30 seats
+    static char[][] planeSeats = new char[4][20]; // 4 rows x 20 seats
     static String[] flightOrigin = {
         "Kuala Lumpur International Airport (KLIA)", 
         "Kota Kinabalu International Airport",
-        "Kuching International Airport",
-        "Penang International Airport",
-        "Kuala Lumpur International Airport 2 (KLIA)2"};
+        "Kuching International Airport"};
     static String[] flightDestination = {
         "UNITED ARAB EMIRATES",
-        "INDONESIA",
-        "CHINA",
         "SWITZERLAND",
         "JAPAN"};
     static double flightPrice = rand.nextDouble() * 9000 + 1000;
@@ -40,8 +36,8 @@ public class airline {
 
             switch (choice) {
                 case 1:
-                    User Information = registerUser();
-                    flightReservation(Information);
+                    User information = registerUser();
+                    flightReservation(information);
                     break;
                 case 2:
                     checkSchedule();
@@ -161,14 +157,14 @@ public class airline {
             System.out.println("\nSelect seat for passenger " + (p + 1));
             System.out.print("Row (A-D): ");
             char chosenRow = sc.next().toUpperCase().charAt(0);
-            System.out.print("Seat Number (1-30): ");
+            System.out.print("Seat Number (1-20): ");
             int chosenSeat = sc.nextInt();
             sc.nextLine();
 
             int rowIndex = chosenRow - 'A';
             int colIndex = chosenSeat - 1;
 
-            if (rowIndex < 0 || rowIndex >= 4 || colIndex < 0 || colIndex >= 30) {
+            if (rowIndex < 0 || rowIndex >= 4 || colIndex < 0 || colIndex >= 20) {
                 System.out.println("Invalid seat.");
             } else if (planeSeats[rowIndex][colIndex] == 'X') {
                 System.out.println("Seat already booked.");
@@ -194,7 +190,8 @@ public class airline {
 
     // ----- PART 5 PAYMENT -----
     double totalPrice = passengerCount * flightPrice;
-    System.out.println("\nTotal Price (RM): " + totalPrice);
+    System.out.printf("Price (RM)    : %.2f%n", flightPrice);
+    System.out.printf("Total Price (RM): %.2f%n", totalPrice);
     System.out.print("Proceed to payment? (Y/N): ");
     char pay = sc.next().toUpperCase().charAt(0);
     sc.nextLine();
@@ -204,7 +201,8 @@ public class airline {
     System.out.println("Payment successful!");
 
     // ----- PART 6 SAVE -----
-    saveBooking(user, bookedSeats, selectedDate, totalPrice);
+   saveBooking(user, bookedSeats, selectedDate, totalPrice);
+
 
     System.out.println("\nBooking Complete! Thank you, " + user.name + "!");
 }
@@ -242,7 +240,7 @@ public class airline {
             bw.write("Destination:" + flightDestination);
             bw.write("Date:" + flightDate);
             bw.write("Seats:" + String.join("-", seatsBooked));
-            bw.write("TotalPrice:" + totalPrice);
+            bw.write("TotalPrice: RM " + String.format("%.2f", totalPrice));
             bw.newLine();
         } catch (IOException e) {
             System.out.println("Error saving booking.");
