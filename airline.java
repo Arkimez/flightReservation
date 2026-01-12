@@ -144,7 +144,7 @@ public class airline {
     System.out.println("Origin        : " + selectedOrigin);
     System.out.println("Destination   : " + selectedDestination);
     System.out.println("Date          : " + selectedDate);
-    System.out.println("Price (RM)    : " + flightPrice);
+    System.out.printf("Price (RM)    : %.2f%n", flightPrice);
     System.out.println("Weather       : " + weatherInfo);
 
     // ----- SEAT DISPLAY -----
@@ -257,25 +257,41 @@ public class airline {
 
     // ---------------- PART 7: Check Schedule ----------------
     public static void checkSchedule() {
-        System.out.print("\nEnter your User ID to check bookings: ");
-        int userID = sc.nextInt();
-        sc.nextLine();
-        boolean found = false;
+    System.out.print("\nEnter your User ID to check bookings: ");
+    int userID = sc.nextInt();
+    sc.nextLine();
+    boolean found = false;
 
-        try (BufferedReader br = new BufferedReader(new FileReader("bookings.txt"))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                if (line.contains("UserID:" + userID)) {
-                    System.out.println("\n" + line);
-                    found = true;
-                }
+    try (BufferedReader br = new BufferedReader(new FileReader("bookings.txt"))) {
+        String line;
+        while ((line = br.readLine()) != null) {
+
+            String[] data = line.split("\\|"); // split by |
+
+            int savedUserID = Integer.parseInt(data[0]);
+
+            if (savedUserID == userID) {
+                System.out.println("\n===== BOOKING FOUND =====");
+                System.out.println("User ID      : " + data[0]);
+                System.out.println("Name         : " + data[1]);
+                System.out.println("Flight No    : " + data[2]);
+                System.out.println("Origin       : " + data[3]);
+                System.out.println("Destination  : " + data[4]);
+                System.out.println("Date         : " + data[5]);
+                System.out.println("Seats        : " + data[6]);
+                System.out.println("Total (RM)   : " + data[7]);
+                found = true;
             }
-        } catch (IOException e) {
-            System.out.println("No bookings found.");
         }
-
-        if (!found) System.out.println("No bookings for this User ID.");
+    } catch (IOException e) {
+        System.out.println("Error reading bookings file.");
     }
+
+    if (!found) {
+        System.out.println("No bookings for this User ID.");
+    }
+}
+
 }
 
 // ---------------- User Class ----------------
