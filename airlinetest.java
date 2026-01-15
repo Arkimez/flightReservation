@@ -35,18 +35,20 @@ public class airlinetest {
       sc.nextLine();
 
       switch (choice) {
-	case 1:
-	  User information = registerUser();
-	  saveUser(information);
-	  break;
-	case 2:
-	  menu(args);
-	  break;
-	case 3:
-	  System.out.println("Thank you for using our system. Have a great day!");
-	  return;
-	default:
-	  System.out.println("Invalid option. Try again.");
+	case 1: {
+		  User information = registerUser();
+		  saveUser(information);
+		  break;
+	}
+	case 2: {
+		  login();
+		  break;
+	}
+	case 0: {
+		  System.out.println("Thank you for using our system. Have a great day!");
+		  return;
+	}
+	default: System.out.println("Invalid option. Try again.");
       }
     }
   }
@@ -307,24 +309,53 @@ public class airlinetest {
     }
   }
 
-  public static void menu (String args[]) {
-    System.out.println("1. Flight Reservation");
-    System.out.println("2. Update Reservation");
-    System.out.println("3. Cancel Reservation");
-    System.out.println("4. Check Flight Schedule");
-    System.out.print("Choose an option: ");
+  public static void menu () {
+    while (true) {
+      System.out.println("\n==== WELCOME ");
+      System.out.println("1. Flight Reservation");
+      System.out.println("2. Update Reservation");
+      System.out.println("3. Cancel Reservation");
+      System.out.println("4. Check Flight Schedule");
+      System.out.println("0. Return To Login.");
+      System.out.print("Choose an option: ");
 
-    int choice = sc.nextInt();
+      int choice = sc.nextInt();
+      sc.nextLine();
 
-    switch (choice) {
-      case 1:
-	break;
-      case 2:
-	break;
-      case 3:
-	break;
-      case 4:
-	break;
+      switch (choice) {
+	case 1:
+	  break;
+	case 2:
+	  break;
+	case 3:
+	  break;
+	case 4: {
+	}
+	case 0: return;
+	default: {
+		   System.out.println("Invalid choice.");
+	}
+      }
+    }
+  }
+
+  public static void login () {
+    System.out.print("Enter your User ID: ");
+    String userID = sc.nextLine();
+
+    try (BufferedReader br = new BufferedReader(new FileReader("users.txt"))) {
+      String line;
+      while ((line = br.readLine()) != null) {
+	String[] data = line.split("\\|");
+
+	if (data[0].equals(userID)) {
+	  menu();
+	  return;
+	}
+      }
+    }
+    catch (IOException e) {
+      System.out.println("Error reading the user file.");
     }
   }
 }
