@@ -65,7 +65,8 @@ public class airlinetest {
     System.out.print("Email Address: ");
     String email = sc.nextLine();
 
-    int userID = rand.nextInt(900) + 100;
+    int id = rand.nextInt(900) + 100;
+    String userID = Integer.toString(id);
     System.out.println("Registration Complete! Your User ID: " + userID);
 
     return new User(name, ic, phone, email, userID);
@@ -208,10 +209,10 @@ public class airlinetest {
     System.out.println("Payment successful!");
 
     // ----- PART 6 SAVE -----
-    saveBooking(user, bookedSeats, selectedDate, totalPrice, selectedOrigin, selectedDestination);
+    saveTicket(user, bookedSeats, selectedDate, totalPrice, selectedOrigin, selectedDestination);
 
 
-    System.out.println("\nBooking Complete! Thank you, " + user.name + "!");
+    System.out.println("\nFlight Reserved! Thank you, " + user.name + "!");
   }
 
 
@@ -237,13 +238,12 @@ public class airlinetest {
     }
   }
 
-  // ---------------- Save Booking to File ----------------
-  public static void saveBooking(User user, String[] seatsBooked, String flightDate, 
+  // ---------------- Save ticket data to tickets.txt ----------------
+  public static void saveTicket(User user, String[] seatsBooked, String flightDate, 
       double totalPrice, String origin, String destination) {
-    try (BufferedWriter bw = new BufferedWriter(new FileWriter("bookings.txt", true))) {
+    try (BufferedWriter bw = new BufferedWriter(new FileWriter("tickets.txt", true))) {
       // Save everything in one line, separated by "|"
       String bookingLine = user.userID + "|" + 
-	user.name + "|" + 
 	flightNumber + "|" + 
 	origin + "|" + 
 	destination + "|" + 
@@ -253,10 +253,11 @@ public class airlinetest {
       bw.write(bookingLine);
       bw.newLine();
     } catch (IOException e) {
-      System.out.println("Error saving booking.");
+      System.out.println("Error reserving flight.");
     }
   }
 
+  // ---------------- Save User data to users.txt ----------------
   public static void saveUser(User user) {
     try (BufferedWriter bw = new BufferedWriter(new FileWriter("users.txt", true))) {
       // Save everything in one line, separated by "|"
@@ -273,45 +274,54 @@ public class airlinetest {
   }
 
   // ---------------- PART 7: Check Schedule ----------------
-  public static void checkSchedule() {
-    System.out.print("\nEnter your User ID to check bookings: ");
-    int userID = sc.nextInt();
-    sc.nextLine();
-    boolean found = false;
+  public static void checkSchedule(User user) {
+    String[] userData = new String[5];
+    String[] ticketData = new String[7];
+    
+    ticketData[0] = "n/a";
+    userData[0] = "n/a";
+    String line;
 
-    try (BufferedReader br = new BufferedReader(new FileReader("bookings.txt"))) {
-      String line;
+    try (BufferedReader br = new BufferedReader(new FileReader("tickets.txt"))) {
       while ((line = br.readLine()) != null) {
-
 	String[] data = line.split("\\|"); // split by |
 
-	int savedUserID = Integer.parseInt(data[0]);
-
-	if (savedUserID == userID) {
-	  System.out.println("\n===== BOOKING FOUND =====");
-	  System.out.println("User ID      : " + data[0]);
-	  System.out.println("Name         : " + data[1]);
-	  System.out.println("Flight No    : " + data[2]);
-	  System.out.println("Origin       : " + data[3]);
-	  System.out.println("Destination  : " + data[4]);
-	  System.out.println("Date         : " + data[5]);
-	  System.out.println("Seats        : " + data[6]);
-	  System.out.println("Total (RM)   : " + data[7]);
-	  found = true;
-	}
+	if (data[0].equals(user.userID))
+	  ticketData = data;
       }
-    } catch (IOException e) {
-      System.out.println("Error reading bookings file.");
+    }
+    catch (IOException e) {
+      System.out.println("Error reading ticket data.");
     }
 
-    if (!found) {
-      System.out.println("No bookings for this User ID.");
+    try (BufferedReader br = new BufferedReader(new FileReader("users.txt"))) {
+      while ((line = br.readLine()) != null) {
+	String[] data = line.split("\\|"); // split by |
+
+	if (data[0].equals(user.userID))
+	  userData = data;
+      }
     }
+    catch (IOException e) {
+      System.out.println("Error reading user data.");
+    }
+
+    if (userData[0].equals(user.userID) && ticketData[0].equals(user.userID)) {
+	  System.out.println("\n===== BOOKING FOUND =====");
+	  System.out.println("User ID      : " + userData[0]);
+	  System.out.println("Name         : " + userData[1]);
+	  System.out.println("Flight No    : " + ticketData[1]);
+	  System.out.println("Origin       : " + ticketData[2]);
+	  System.out.println("Destination  : " + ticketData[3]);
+	  System.out.println("Date         : " + ticketData[4]);
+	  System.out.println("Seats        : " + ticketData[5]);
+	  System.out.println("Total (RM)   : " + ticketData[6]);
+	  System.out.println();
+	}
   }
 
-  public static void menu () {
+  public static void menu (User user) {
     while (true) {
-      System.out.println("\n==== WELCOME ");
       System.out.println("1. Flight Reservation");
       System.out.println("2. Update Reservation");
       System.out.println("3. Cancel Reservation");
@@ -323,17 +333,13 @@ public class airlinetest {
       sc.nextLine();
 
       switch (choice) {
-	case 1:
-	  break;
-	case 2:
-	  break;
-	case 3:
-	  break;
-	case 4: {
-	}
+	case 1: flightReservation(user); break;
+	case 2: break;
+	case 3: break;
+	case 4: checkSchedule(user); break;
 	case 0: return;
 	default: {
-		   System.out.println("Invalid choice.");
+		   System.out.println("Invalid choice.\n");
 	}
       }
     }
@@ -349,7 +355,9 @@ public class airlinetest {
 	String[] data = line.split("\\|");
 
 	if (data[0].equals(userID)) {
-	  menu();
+	  User user = new User(data[1], data[0]);
+	  System.out.println("\n==== WELCOME " + user.name + " ====");
+	  menu(user);
 	  return;
 	}
       }
@@ -368,13 +376,21 @@ class User {
   String ic;
   String phone;
   String email;
-  int userID;
+  String userID;
 
-  public User(String name, String ic, String phone, String email, int userID) {
+  public User(String name, String ic, String phone, String email, String userID) {
     this.name = name;
     this.ic = ic;
     this.phone = phone;
     this.email = email;
+    this.userID = userID;
+  }
+
+  public User(String name, String userID) { // overloaded method used for only getting user id.
+    this.name = name;
+    this.ic = "n/a";
+    this.phone = "n/a";
+    this.email = "n/a";
     this.userID = userID;
   }
 }
