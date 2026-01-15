@@ -22,10 +22,11 @@ public class airlinetest {
 
     initSeats(); // initialize seat map
 
-    // ---------------- PART 1: Main Menu ----------------
+    // ----------------  Main Menu ----------------
 
     while (true) {
-      System.out.println("\n===== AIRLINE RESERVATION SYSTEM =====");
+      clearScreen();
+      System.out.println("===== AIRLINE RESERVATION SYSTEM =====");
       System.out.println("1. Register User");
       System.out.println("2. Log In");
       System.out.println("0. Exit");
@@ -53,7 +54,7 @@ public class airlinetest {
     }
   }
 
-  // ---------------- PART 2: User Registration ----------------
+  // ---------------- User Registration ----------------
   public static User registerUser() {
     System.out.println("\n===== USER REGISTRATION =====");
     System.out.print("Full Name: ");
@@ -72,10 +73,29 @@ public class airlinetest {
     return new User(name, ic, phone, email, userID);
   }
 
-  // ---------------- PART 3: Flight Reservation ----------------
+  // ---------------- Flight Reservation ----------------
   public static void flightReservation(User user) {
 
-    // ----- ORIGIN SELECTION -----
+    // ----- Already booked -----
+    try (BufferedReader br = new BufferedReader(new FileReader("bookings.txt"))) {
+      String line;
+      while((line = br.readLine()) != null) {
+	String[] data = line.split("\\|");
+
+	if (data[0].equals(user.userID)) {
+	  clearScreen();
+	  System.out.println("User already has a booking!\n");
+	  return;
+	}
+      }
+    }
+    catch (IOException e) {
+      clearScreen();
+      System.out.println("Error reading booking data.");
+      return;
+    }
+
+    // ----- Origin Selection -----
     System.out.println("\n===== SELECT ORIGIN =====");
     for (int i = 0; i < flightOrigin.length; i++) {
       System.out.println((i + 1) + ". " + flightOrigin[i]);
@@ -86,7 +106,7 @@ public class airlinetest {
 
     String selectedOrigin = flightOrigin[originChoice];
 
-    // ----- DESTINATION SELECTION -----
+    // ----- Destination Selection -----
     System.out.println("\n===== SELECT DESTINATION =====");
     for (int i = 0; i < flightDestination.length; i++) {
       System.out.println((i + 1) + ". " + flightDestination[i]);
@@ -97,7 +117,7 @@ public class airlinetest {
 
     String selectedDestination = flightDestination[destChoice];
 
-    // ----- DATE SELECTION (A, B, C) -----
+    // ----- Date Selection (A, B, C) -----
     String[] dateOptions = new String[3];
     int day = 0;
     int year = 2026;
@@ -131,7 +151,7 @@ public class airlinetest {
 		return;
     }
 
-    // ----- WEATHER -----
+    // ----- Determine Weather -----
     int weatherLevel = rand.nextInt(3) + 1;
     String weatherInfo;
     if (weatherLevel == 1)
@@ -141,7 +161,7 @@ public class airlinetest {
     else
       weatherInfo = "Heavy Storm - Flight may be delayed";
 
-    // ----- DISPLAY FLIGHT DETAILS -----
+    // ----- Display Flight Details -----
     System.out.println("\n===== FLIGHT DETAILS =====");
     System.out.println("Flight Number : " + flightNumber);
     System.out.println("Origin        : " + selectedOrigin);
@@ -150,10 +170,10 @@ public class airlinetest {
     System.out.printf("Price (RM)    : %.2f%n", flightPrice);
     System.out.println("Weather       : " + weatherInfo);
 
-    // ----- SEAT DISPLAY -----
+    // ----- Seat Display -----
     displaySeats();
 
-    // ----- PASSENGERS -----
+    // ----- Passengers -----
     System.out.print("\nNumber of Passengers: ");
     int passengerCount = sc.nextInt();
     sc.nextLine();
@@ -185,7 +205,7 @@ public class airlinetest {
       }
     }
 
-    // ----- PART 4 WEATHER CONFIRMATION -----
+    // ----- Weather Confirmaation -----
     if (weatherLevel == 3) {
       System.out.print("\nWeather is severe. Proceed? (Y/N): ");
       char confirm = sc.next().toUpperCase().charAt(0);
@@ -196,7 +216,7 @@ public class airlinetest {
       }
     }
 
-    // ----- PART 5 PAYMENT -----
+    // ----- Payment -----
     double totalPrice = passengerCount * flightPrice;
     System.out.printf("Price (RM)    : %.2f%n", flightPrice);
     System.out.printf("Total Price (RM): %.2f%n", totalPrice);
@@ -208,13 +228,45 @@ public class airlinetest {
 
     System.out.println("Payment successful!");
 
-    // ----- PART 6 SAVE -----
-    saveTicket(user, bookedSeats, selectedDate, totalPrice, selectedOrigin, selectedDestination);
-
-
+    saveBooking(user, bookedSeats, selectedDate, totalPrice, selectedOrigin, selectedDestination);
     System.out.println("\nFlight Reserved! Thank you, " + user.name + "!");
   }
 
+  // ---------------- Cancel Reservation -----------
+  public static void cancelReservation(User user) {
+    boolean found = false;
+
+    try (BufferedReader br = new BufferedReader(new FileReader("bookings.txt"));
+	BufferedWriter bw = new BufferedWriter(new FileWriter("bookings.txt"))) {
+
+      String line;
+      while ((line = br.readLine()) != null) {
+	String[] data = line.split("\\|");
+
+	if (data[0].equals(user.userID)) {
+	  found = true;
+	  continue;
+	}
+
+	bw.write(line);
+	bw.newLine();
+      }
+    }
+    catch (IOException e) {
+      clearScreen();
+      System.out.println("Error processing bookings data.");
+      return;
+    }
+
+    if (found) {
+      clearScreen();
+      System.out.println("Reservation for User ID " + user.userID + " has been canceled.");
+    }
+    else {
+      clearScreen();
+      System.out.println("No reservation found for User ID " + user.userID + ".");
+    }
+  }
 
   // ---------------- Display Seats ----------------
   public static void displaySeats() {
@@ -238,10 +290,10 @@ public class airlinetest {
     }
   }
 
-  // ---------------- Save ticket data to tickets.txt ----------------
-  public static void saveTicket(User user, String[] seatsBooked, String flightDate, 
+  // ---------------- Save booking data to bookings.txt ----------------
+  public static void saveBooking(User user, String[] seatsBooked, String flightDate, 
       double totalPrice, String origin, String destination) {
-    try (BufferedWriter bw = new BufferedWriter(new FileWriter("tickets.txt", true))) {
+    try (BufferedWriter bw = new BufferedWriter(new FileWriter("bookings.txt", true))) {
       // Save everything in one line, separated by "|"
       String bookingLine = user.userID + "|" + 
 	flightNumber + "|" + 
@@ -252,8 +304,11 @@ public class airlinetest {
 	String.format("%.2f", totalPrice);
       bw.write(bookingLine);
       bw.newLine();
-    } catch (IOException e) {
+    } 
+    catch (IOException e) {
+      clearScreen();
       System.out.println("Error reserving flight.");
+      return;
     }
   }
 
@@ -268,30 +323,34 @@ public class airlinetest {
 	user.email;
       bw.write(userLine);
       bw.newLine();
-    } catch (IOException e) {
+    } 
+    catch (IOException e) {
+      clearScreen();
       System.out.println("Error saving booking.");
+      return;
     }
   }
 
-  // ---------------- PART 7: Check Schedule ----------------
+  // ---------------- Check Schedule ----------------
   public static void checkSchedule(User user) {
     String[] userData = new String[5];
-    String[] ticketData = new String[7];
-    
-    ticketData[0] = "n/a";
+    String[] bookingData = new String[7];
+
+    bookingData[0] = "n/a";
     userData[0] = "n/a";
     String line;
 
-    try (BufferedReader br = new BufferedReader(new FileReader("tickets.txt"))) {
+    try (BufferedReader br = new BufferedReader(new FileReader("bookings.txt"))) {
       while ((line = br.readLine()) != null) {
 	String[] data = line.split("\\|"); // split by |
 
 	if (data[0].equals(user.userID))
-	  ticketData = data;
+	  bookingData = data;
       }
     }
     catch (IOException e) {
-      System.out.println("Error reading ticket data.");
+      clearScreen();
+      System.out.println("Error reading booking data.");
     }
 
     try (BufferedReader br = new BufferedReader(new FileReader("users.txt"))) {
@@ -303,29 +362,31 @@ public class airlinetest {
       }
     }
     catch (IOException e) {
+      clearScreen();
       System.out.println("Error reading user data.");
     }
 
-    if (userData[0].equals(user.userID) && ticketData[0].equals(user.userID)) {
-	  System.out.println("\n===== BOOKING FOUND =====");
-	  System.out.println("User ID      : " + userData[0]);
-	  System.out.println("Name         : " + userData[1]);
-	  System.out.println("Flight No    : " + ticketData[1]);
-	  System.out.println("Origin       : " + ticketData[2]);
-	  System.out.println("Destination  : " + ticketData[3]);
-	  System.out.println("Date         : " + ticketData[4]);
-	  System.out.println("Seats        : " + ticketData[5]);
-	  System.out.println("Total (RM)   : " + ticketData[6]);
-	  System.out.println();
-	}
+    if (userData[0].equals(user.userID) && bookingData[0].equals(user.userID)) {
+      clearScreen();
+      System.out.println("===== BOOKING FOUND =====");
+      System.out.println("User ID      : " + userData[0]);
+      System.out.println("Name         : " + userData[1]);
+      System.out.println("Flight No    : " + bookingData[1]);
+      System.out.println("Origin       : " + bookingData[2]);
+      System.out.println("Destination  : " + bookingData[3]);
+      System.out.println("Date         : " + bookingData[4]);
+      System.out.println("Seats        : " + bookingData[5]);
+      System.out.println("Total (RM)   : " + bookingData[6]);
+      System.out.println();
+    }
   }
 
+  // ------------------ User menu -------------------
   public static void menu (User user) {
     while (true) {
       System.out.println("1. Flight Reservation");
-      System.out.println("2. Update Reservation");
-      System.out.println("3. Cancel Reservation");
-      System.out.println("4. Check Flight Schedule");
+      System.out.println("2. Cancel Reservation");
+      System.out.println("3. Check Flight Schedule");
       System.out.println("0. Return To Login.");
       System.out.print("Choose an option: ");
 
@@ -334,9 +395,8 @@ public class airlinetest {
 
       switch (choice) {
 	case 1: flightReservation(user); break;
-	case 2: break;
-	case 3: break;
-	case 4: checkSchedule(user); break;
+	case 2: cancelReservation(user); break;
+	case 3: checkSchedule(user); break;
 	case 0: return;
 	default: {
 		   System.out.println("Invalid choice.\n");
@@ -345,6 +405,7 @@ public class airlinetest {
     }
   }
 
+  // ---------------- User Login -----------------
   public static void login () {
     System.out.print("Enter your User ID: ");
     String userID = sc.nextLine();
@@ -356,15 +417,23 @@ public class airlinetest {
 
 	if (data[0].equals(userID)) {
 	  User user = new User(data[1], data[0]);
-	  System.out.println("\n==== WELCOME " + user.name + " ====");
+	  clearScreen();
+	  System.out.println("==== WELCOME " + user.name + " ====");
 	  menu(user);
 	  return;
 	}
       }
     }
     catch (IOException e) {
+      clearScreen();
       System.out.println("Error reading the user file.");
     }
+  }
+
+  // Clears screen; will be used frequently for clean UI
+  public static void clearScreen() {
+    System.out.print("\033[H\033[2J");
+    System.out.flush();
   }
 }
 
