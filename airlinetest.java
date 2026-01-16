@@ -21,11 +21,11 @@ public class airlinetest {
   public static void main(String[] args) {
 
     initSeats(); // initialize seat map
+    clearScreen(); // clears screen before program begins
 
     // ----------------  Main Menu ----------------
 
     while (true) {
-      clearScreen();
       System.out.println("===== AIRLINE RESERVATION SYSTEM =====");
       System.out.println("1. Register User");
       System.out.println("2. Log In");
@@ -68,6 +68,8 @@ public class airlinetest {
 
     int id = rand.nextInt(900) + 100;
     String userID = Integer.toString(id);
+
+    clearScreen();
     System.out.println("Registration Complete! Your User ID: " + userID);
 
     return new User(name, ic, phone, email, userID);
@@ -226,29 +228,43 @@ public class airlinetest {
 
     if (pay != 'Y') return;
 
+    clearScreen();
     System.out.println("Payment successful!");
-
     saveBooking(user, bookedSeats, selectedDate, totalPrice, selectedOrigin, selectedDestination);
-    System.out.println("\nFlight Reserved! Thank you, " + user.name + "!");
+    System.out.println("Flight Reserved! Thank you, " + user.name + "!\n");
   }
 
   // ---------------- Cancel Reservation -----------
   public static void cancelReservation(User user) {
     boolean found = false;
+    int count = 0;
+    String[] savedData = new String[20]; // can be increased if project becomes big enough
 
-    try (BufferedReader br = new BufferedReader(new FileReader("bookings.txt"));
-	BufferedWriter bw = new BufferedWriter(new FileWriter("bookings.txt"))) {
-
+    // Saving all the data from bookings into an array, skipping the canceled line
+    try (BufferedReader br = new BufferedReader(new FileReader("bookings.txt"))) {
       String line;
       while ((line = br.readLine()) != null) {
 	String[] data = line.split("\\|");
 
 	if (data[0].equals(user.userID)) {
 	  found = true;
+	  System.out.println("found is now true!");
 	  continue;
 	}
+	else
+	  savedData[count++] = line;
+      }
+    }
+    catch (IOException e) {
+      clearScreen();
+      System.out.println("Error processing bookings data.");
+      return;
+    }
 
-	bw.write(line);
+    // Writing all the saved data inside the file again
+    try (BufferedWriter bw = new BufferedWriter(new FileWriter("bookings.txt"))) {
+      for (int i = 0; i < count; i++) {
+	bw.write(savedData[i]);
 	bw.newLine();
       }
     }
@@ -397,7 +413,7 @@ public class airlinetest {
 	case 1: flightReservation(user); break;
 	case 2: cancelReservation(user); break;
 	case 3: checkSchedule(user); break;
-	case 0: return;
+	case 0: clearScreen(); return;
 	default: {
 		   System.out.println("Invalid choice.\n");
 	}
