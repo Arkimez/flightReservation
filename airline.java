@@ -23,6 +23,7 @@ public class airline {
     initFiles();
     initSeats(); // initialize seat map
     clearScreen(); // clears screen before program begins
+    int choice = 0;
 
     // ----------------  Main Menu ----------------
 
@@ -33,8 +34,16 @@ public class airline {
       System.out.println("0. Exit");
       System.out.print("Choose an option: ");
 
-      int choice = sc.nextInt();
-      sc.nextLine();
+      try {
+	choice = sc.nextInt();
+	sc.nextLine();
+      }
+      catch (InputMismatchException e) {
+	sc.nextLine();
+	clearScreen();
+	System.out.println("Please enter a number.");
+	continue;
+      }
 
       switch (choice) {
 	case 1: {
@@ -42,15 +51,12 @@ public class airline {
 		  saveUser(information);
 		  break;
 	}
-	case 2: {
-		  login();
-		  break;
-	}
+	case 2: login(); break;
 	case 0: {
 		  System.out.println("Thank you for using our system. Have a great day!");
 		  return;
 	}
-	default: System.out.println("Invalid option. Try again.");
+	default: clearScreen(); System.out.println("Invalid option. Try again.");
       }
     }
   }
@@ -71,7 +77,7 @@ public class airline {
     String userID = Integer.toString(id);
 
     clearScreen();
-    System.out.println("Registration Complete! Your User ID: " + userID);
+    System.out.println("Registration Complete! Your User ID: " + userID + "\n");
 
     return new User(name, ic, phone, email, userID);
   }
@@ -136,22 +142,22 @@ public class airline {
     }
 
     System.out.println("\n===== SELECT FLIGHT DATE =====");
-    System.out.println("A. " + dateOptions[0]);
-    System.out.println("B. " + dateOptions[1]);
-    System.out.println("C. " + dateOptions[2]);
-    System.out.print("Choose Date (A/B/C): ");
+    System.out.println("1. " + dateOptions[0]);
+    System.out.println("2. " + dateOptions[1]);
+    System.out.println("3. " + dateOptions[2]);
+    System.out.print("Choose Date (1-3): ");
 
-    char dateChoice = sc.next().toUpperCase().charAt(0);
+    int dateChoice = sc.nextInt();
     sc.nextLine();
 
     String selectedDate;
     switch (dateChoice) {
-      case 'A': selectedDate = dateOptions[0]; break;
-      case 'B': selectedDate = dateOptions[1]; break;
-      case 'C': selectedDate = dateOptions[2]; break;
+      case 1: selectedDate = dateOptions[0]; break;
+      case 2: selectedDate = dateOptions[1]; break;
+      case 3: selectedDate = dateOptions[2]; break;
       default:
-		System.out.println("Invalid choice. Returning to menu.");
-		return;
+	      System.out.println("Invalid choice. Returning to menu.");
+	      return;
     }
 
     // ----- Determine Weather -----
@@ -396,10 +402,16 @@ public class airline {
       System.out.println("Total (RM)   : " + bookingData[6]);
       System.out.println();
     }
+    else {
+      clearScreen();
+      System.out.println("User has no bookings.");
+    }
   }
 
   // ------------------ User menu -------------------
   public static void menu (User user) {
+    int choice = 0;
+
     while (true) {
       System.out.println("1. Flight Reservation");
       System.out.println("2. Cancel Reservation");
@@ -407,17 +419,23 @@ public class airline {
       System.out.println("0. Return To Login.");
       System.out.print("Choose an option: ");
 
-      int choice = sc.nextInt();
-      sc.nextLine();
+      try {
+	choice = sc.nextInt();
+	sc.nextLine();
+      }
+      catch (InputMismatchException e) {
+	sc.nextLine();
+	clearScreen();
+	System.out.println("Please enter a number.");
+	continue;
+      }
 
       switch (choice) {
 	case 1: flightReservation(user); break;
 	case 2: cancelReservation(user); break;
 	case 3: checkSchedule(user); break;
 	case 0: clearScreen(); return;
-	default: {
-		   System.out.println("Invalid choice.\n");
-	}
+	default: clearScreen(); System.out.println("Invalid choice.\n");
       }
     }
   }
@@ -445,6 +463,11 @@ public class airline {
       clearScreen();
       System.out.println("Error reading the user file.");
     }
+
+    // if user is not found
+    clearScreen();
+    System.out.println("Invalid User ID.");
+    return;
   }
 
   // Initialize files to avoid errors when writing and reading
